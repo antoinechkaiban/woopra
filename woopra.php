@@ -177,6 +177,7 @@ class Woopra {
  */
 require_once( dirname(__FILE__) . '/inc/frontend.php' 		);
 require_once( dirname(__FILE__) . '/inc/events.php' 		);
+require_once( dirname(__FILE__) . '/woopra-php-sdk/woopra_tracker.php' 		);
 if (is_admin()) {
 	require_once( dirname(__FILE__) . '/inc/admin.php' 		);
 	require_once( dirname(__FILE__) . '/inc/xml.php' 		);
