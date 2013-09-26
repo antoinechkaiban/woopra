@@ -98,15 +98,19 @@ class WoopraFrontend extends Woopra {
 		}
 	}
 	
-	function track_author() {
-		$page_data = array();
-        wp_reset_query();
-        global $post;
-        $myvar = get_the_category($post->ID);
-        $myvar = $myvar[0]->cat_name;
-		$page_data["author"] = js_escape(get_the_author_meta("display_name",$post->post_author));
-		$page_data["category"] = isset($myvar) ? js_escape($myvar) : "Uncategorized";
-		$this->woopra->track("pv", $page_data);
+	function track() {
+		if ($this->get_option('track_author') && is_single()) {
+			$page_data = array();
+	        wp_reset_query();
+	        global $post;
+	        $myvar = get_the_category($post->ID);
+	        $myvar = $myvar[0]->cat_name;
+			$page_data["author"] = js_escape(get_the_author_meta("display_name",$post->post_author));
+			$page_data["category"] = isset($myvar) ? js_escape($myvar) : "Uncategorized";
+			$this->woopra->track("pv", $page_data)->woopra_code();
+		} else {
+			$this->woopra->track()->woopra_code();
+		}
 	}
 	
 	/**
@@ -114,30 +118,15 @@ class WoopraFrontend extends Woopra {
 	 * @return none
 	 */
 	function set_tracker() {
-		
+		global $post;
 		if (current_user_can('manage_options') && ! $this->get_option('ignore_admin')) {
 			if($this->get_option('track_admin')) {
-				if ($this->get_option('track_author') && is_single()) {
-					add_action('admin_footer', array(&$this, 'track_author'), 10);
-				} else {
-					add_action('admin_footer', array(&$this->woopra, 'track'), 10);
-				}
-				add_action('admin_footer', array(&$this->woopra, 'woopra_code'), 10);
+				add_action('admin_footer', array(&$this, 'track'), 10);
 			} else {
-				if ($this->get_option('track_author') && is_single()) {
-					add_action('wp_head', array(&$this, 'track_author'), 10);
-				} else {
-					add_action('wp_head', array(&$this->woopra, 'track'), 10);
-				}
-				add_action('wp_head', array(&$this->woopra, 'woopra_code'), 10);
+				add_action('wp_head', array(&$this, 'track'), 10);
 			}
 		} elseif(!current_user_can('manage_options')) {
-			if ($this->get_option('track_author') && is_single()) {
-				add_action('wp_head', array(&$this, 'track_author'), 10);
-			} else {
-				add_action('wp_head', array(&$this->woopra, 'track'), 10);
-			}
-			add_action('wp_head', array(&$this->woopra, 'woopra_code'), 10);
+			add_action('wp_head', array(&$this, 'track'), 10);
 		}
 	}
 	

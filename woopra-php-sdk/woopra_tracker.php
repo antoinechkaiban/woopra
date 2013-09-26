@@ -82,7 +82,9 @@ class WoopraTracker {
 
 	/**
 	* Events array stack
-	* Each item of the stack is an array(2)
+	* Each item of the stack is either:
+	* - an empty array (if pv event)
+	* - an array(2) (if custom event)
 	* O (string) - the name of the event
 	* 1 (array) - properties associated with that action
 	* @var array
@@ -166,9 +168,15 @@ class WoopraTracker {
 		if (isset($this->events)) {
 
 			foreach ($this->events as $event) {
+				if(empty($event)) {
+?>
+		woopra.track();
+<?php
+				} else {
 ?>
 		woopra.track(<?php echo json_encode($event[0]); ?>, <?php echo json_encode($event[1]); ?>); 
 <?php
+				}
 			}
 			//Events have been printed, reset the events as an empty array
 			unset( $this->events );
@@ -361,6 +369,11 @@ class WoopraTracker {
 		woopra.track();
 	</script>
 <?php
+			} else {
+				if (! isset($this->events) ) {
+					$this->events = array();
+				}
+				array_push( $this->events, array());
 			}
 			return $this;
 		}
