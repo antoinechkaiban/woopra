@@ -38,6 +38,10 @@ class WoopraFrontend extends Woopra {
 			add_action('init', array(&$this, 'register_events'));
 		}
 		
+		if ($this->get_option('other_events')) {
+			add_action("woopra_track", array(&$this->woopra, "track"), 10, 3);
+		}
+		
 		//Register front-end tracking
 		add_action('init', array(&$this, 'set_tracker'));
 		
@@ -107,9 +111,44 @@ class WoopraFrontend extends Woopra {
 	        $myvar = $myvar[0]->cat_name;
 			$page_data["author"] = js_escape(get_the_author_meta("display_name",$post->post_author));
 			$page_data["category"] = isset($myvar) ? js_escape($myvar) : "Uncategorized";
+			if($this->get_option('campaign_tracking')) {
+				$new_user = array();
+				foreach($_GET as $key => $value) {
+					if (preg_match('/^utm_/', $key) == 1) {
+						$page_data[preg_replace('/^utm_/', "", $key)] = $value;
+					} elseif(preg_match('/^wv_/', $key) == 1) {
+						$new_user[preg_replace('/^wv_/', "", $key)] = $value;
+					}
+				}
+				if(!empty($new_user)) {
+					$this->woopra->identify($new_user);
+				}
+			}
 			$this->woopra->track("pv", $page_data)->woopra_code();
 		} else {
-			$this->woopra->track()->woopra_code();
+			if($this->get_option('campaign_tracking')) {
+				$page_data = array();
+				$new_user = array();
+				foreach($_GET as $key => $value) {
+					if (preg_match('/^utm_/', $key) == 1) {
+						$page_data[preg_replace('/^utm_/', "", $key)] = $value;
+					} elseif(preg_match('/^wv_/', $key) == 1) {
+						$new_user[preg_replace('/^wv_/', "", $key)] = $value;
+					}
+				}
+				if(!empty($new_user)) {
+					$this->woopra->identify($new_user);
+				}
+				if(!empty($page_data)) {
+					$this->woopra->track("pv", $page_data)->woopra_code();
+				} else {
+					$this->woopra->track()->woopra_code();
+				}
+				
+			} else {
+				$this->woopra->track()->woopra_code();
+			}
+			
 		}
 	}
 	

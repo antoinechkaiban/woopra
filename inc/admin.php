@@ -360,6 +360,8 @@ class WoopraAdmin extends Woopra {
 			'use_timeout'		=> 0,
 			'process_events'	=> 1,
 			'timeout'			=> 600,
+			'track_author'		=> 0,
+			'campaign_tracking'	=> 0
 		);
 		return $defaults;
 	}
@@ -470,6 +472,12 @@ class WoopraAdmin extends Woopra {
 				<input type="checkbox" value="1"<?php checked('1', $this->get_option('track_author')); ?> id="track_author" name="woopra[track_author]"/> <label for="track_author"><?php _e("Track Authors and Categories"); ?> </label><br /><?php _e("Enable this check box if you want Woopra to track the author and the category of a visited blog post. <a href=\"http://www.woopra.com/docs/jsguide/#custom_page_options\" target=\"_blank\">More about Custom Page Options</a>.",'woopra'); ?>
 			</td>
 		</tr>
+		<tr align="top">
+			<th scope="row"><?php _e('Campaign Tracking','woopra') ?></th>
+			<td>
+				<input type="checkbox" value="1"<?php checked('1', $this->get_option('campaign_tracking')); ?> id="campaign_tracking" name="woopra[campaign_tracking]"/> <label for="campaign_tracking"><?php _e("Enable Campaign Tracking"); ?> </label><br /><?php _e("Enable this check box if you want Woopra to track whether or not users followed a link from a marketing campaign. <a href=\"https://www.woopra.com/blog/2013/09/10/announcing-enhanced-campaign-tracking/\" target=\"_blank\">More about Campaign Tracking</a>.",'woopra'); ?>
+			</td>
+		</tr>
 	</table>
 	<br/>
 	<h3><? _e('Event Settings', 'woopra'); ?></h3>
@@ -493,6 +501,12 @@ class WoopraAdmin extends Woopra {
 				if ($event_reg < 1)
 					echo "<strong>" . __('No Main Events Registered.', 'woopra') . "</strong>";
 			?>				
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><?php _e('Other Events Tracking', 'woopra') ?></th>
+			<td>
+				<input type="checkbox" value="1"<?php checked('1', $this->get_option('other_events')); ?> id="other_events" name="woopra[other_events]"/> <label for="other_events"><?php _e("Turn on Other Events Tracking", 'woopra'); ?></label><br /><?php printf(__("If this is turned on, you will be able to track other events just by calling:<br><em>do_action(\"woopra_track\" [, &#36;event_name = \"pv\" [, &#36;event_properties = array() [, &#36;back_end_processing = false]]])</em>", 'woopra')); ?>
 			</td>
 		</tr>
 		<tr valign="top">
