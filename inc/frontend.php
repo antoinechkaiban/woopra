@@ -109,7 +109,7 @@ class WoopraFrontend extends Woopra {
         $myvar = get_the_category($post->ID);
         $myvar = $myvar[0]->cat_name;
 		$page_data["author"] = js_escape(get_the_author_meta("display_name",$post->post_author));
-		$page_data["category"] = js_escape($myvar);
+		$page_data["category"] = isset($myvar) ? js_escape($myvar) : "Uncategorized";
 		$this->woopra->track("pv", $page_data);
 	}
 	
