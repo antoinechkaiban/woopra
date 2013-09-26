@@ -506,7 +506,7 @@ class WoopraAdmin extends Woopra {
 		<tr valign="top">
 			<th scope="row"><?php _e('Other Events Tracking', 'woopra') ?></th>
 			<td>
-				<input type="checkbox" value="1"<?php checked('1', $this->get_option('other_events')); ?> id="other_events" name="woopra[other_events]"/> <label for="other_events"><?php _e("Turn on Other Events Tracking", 'woopra'); ?></label><br /><?php printf(__("If this is turned on, you will be able to track other events just by calling:<br><em>do_action(\"woopra_track\" [, &#36;event_name = \"pv\" [, &#36;event_properties = array() [, &#36;back_end_processing = false]]])</em>", 'woopra')); ?>
+				<input type="checkbox" value="1"<?php checked('1', $this->get_option('other_events')); ?> id="other_events" name="woopra[other_events]"/> <label for="other_events"><?php _e("Other Events Tracking", 'woopra'); ?></label><br /><?php printf(__("If this is turned on, you will be able to track other events just by calling:<br><em>do_action(\"woopra_track\" [, &#36;event_name = \"pv\" [, &#36;event_properties = array() [, &#36;back_end_processing = false]]]);</em>", 'woopra')); ?>
 			</td>
 		</tr>
 		<tr valign="top">
