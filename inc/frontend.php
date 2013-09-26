@@ -38,12 +38,8 @@ class WoopraFrontend extends Woopra {
 			add_action('init', array(&$this, 'register_events'));
 		}
 		
-		add_action('wp', array(&$this, 'woopra_track'));
-		add_action('admin_head', array(&$this, 'woopra_track'), 10);
-		
-		
-		
-		
+		//Register front-end tracking
+		add_action('init', array(&$this, 'set_tracker'));
 		
 	}
 	
@@ -117,7 +113,7 @@ class WoopraFrontend extends Woopra {
 	 * Outputs JS tracker
 	 * @return none
 	 */
-	function woopra_track() {
+	function set_tracker() {
 		
 		if (current_user_can('manage_options') && ! $this->get_option('ignore_admin')) {
 			if($this->get_option('track_admin')) {
