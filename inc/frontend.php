@@ -117,27 +117,27 @@ class WoopraFrontend extends Woopra {
 		
 		if (current_user_can('manage_options') && ! $this->get_option('ignore_admin')) {
 			if($this->get_option('track_admin')) {
-				add_action('admin_footer', array(&$this->woopra, 'woopra_code'), 10);
-				if ($this->get_option('track_author')) {
+				if ($this->get_option('track_author') && is_single()) {
 					add_action('admin_footer', array(&$this, 'track_author'), 10);
 				} else {
 					add_action('admin_footer', array(&$this->woopra, 'track'), 10);
-				}	
+				}
+				add_action('admin_footer', array(&$this->woopra, 'woopra_code'), 10);
 			} else {
-				add_action('wp_head', array(&$this->woopra, 'woopra_code'), 10);
-				if ($this->get_option('track_author')) {
+				if ($this->get_option('track_author') && is_single()) {
 					add_action('wp_head', array(&$this, 'track_author'), 10);
 				} else {
 					add_action('wp_head', array(&$this->woopra, 'track'), 10);
 				}
+				add_action('wp_head', array(&$this->woopra, 'woopra_code'), 10);
 			}
 		} elseif(!current_user_can('manage_options')) {
-			add_action('wp_head', array(&$this->woopra, 'woopra_code'), 10);
-			if ($this->get_option('track_author')) {
+			if ($this->get_option('track_author') && is_single()) {
 				add_action('wp_head', array(&$this, 'track_author'), 10);
 			} else {
 				add_action('wp_head', array(&$this->woopra, 'track'), 10);
 			}
+			add_action('wp_head', array(&$this->woopra, 'woopra_code'), 10);
 		}
 	}
 	
