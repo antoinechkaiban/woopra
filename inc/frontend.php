@@ -111,44 +111,9 @@ class WoopraFrontend extends Woopra {
 	        $myvar = $myvar[0]->cat_name;
 			$page_data["author"] = js_escape(get_the_author_meta("display_name",$post->post_author));
 			$page_data["category"] = isset($myvar) ? js_escape($myvar) : "Uncategorized";
-			if($this->get_option('campaign_tracking')) {
-				$new_user = array();
-				foreach($_GET as $key => $value) {
-					if (preg_match('/^utm_/', $key) == 1) {
-						$page_data[preg_replace('/^utm_/', "", $key)] = $value;
-					} elseif(preg_match('/^wv_/', $key) == 1) {
-						$new_user[preg_replace('/^wv_/', "", $key)] = $value;
-					}
-				}
-				if(!empty($new_user)) {
-					$this->woopra->identify($new_user);
-				}
-			}
 			$this->woopra->track("pv", $page_data)->woopra_code();
 		} else {
-			if($this->get_option('campaign_tracking')) {
-				$page_data = array();
-				$new_user = array();
-				foreach($_GET as $key => $value) {
-					if (preg_match('/^utm_/', $key) == 1) {
-						$page_data[preg_replace('/^utm_/', "", $key)] = $value;
-					} elseif(preg_match('/^wv_/', $key) == 1) {
-						$new_user[preg_replace('/^wv_/', "", $key)] = $value;
-					}
-				}
-				if(!empty($new_user)) {
-					$this->woopra->identify($new_user);
-				}
-				if(!empty($page_data)) {
-					$this->woopra->track("pv", $page_data)->woopra_code();
-				} else {
-					$this->woopra->track()->woopra_code();
-				}
-				
-			} else {
-				$this->woopra->track()->woopra_code();
-			}
-			
+			$this->woopra->track()->woopra_code();
 		}
 	}
 	
@@ -183,7 +148,7 @@ class WoopraFrontend extends Woopra {
 		if ($this->get_option('use_timeout')) {
 			$this->config["idle_timeout"] = $this->get_option('timeout')*1000;
 		}
-		
+		$this->config["hide_campaign"] = $this->get_option('hide_campaign'));
 	}
 	
 }
