@@ -475,7 +475,7 @@ class WoopraAdmin extends Woopra {
 		<tr align="top">
 			<th scope="row"><?php _e('Campaign Tracking','woopra') ?></th>
 			<td>
-				<input type="checkbox" value="1"<?php checked('1', $this->get_option('hide_campaign')); ?> id="hide_campaign" name="woopra[hide_campaign]"/> <label for="hide_campaign"><?php _e("Enable Campaign Tracking"); ?> </label><br /><?php _e("Hide campaign properties from url (e.g. utm_campaign). <a href=\"https://www.woopra.com/blog/2013/09/10/announcing-enhanced-campaign-tracking/\" target=\"_blank\">More about Campaign Tracking</a>.",'woopra'); ?>
+				<input type="checkbox" value="1"<?php checked('1', $this->get_option('hide_campaign')); ?> id="hide_campaign" name="woopra[hide_campaign]"/> <label for="hide_campaign"><?php _e("Hide Campaign Properties"); ?> </label><br /><?php _e("Hide campaign properties from url (e.g. utm_campaign). <a href=\"https://www.woopra.com/blog/2013/09/10/announcing-enhanced-campaign-tracking/\" target=\"_blank\">More about Campaign Tracking</a>.",'woopra'); ?>
 			</td>
 		</tr>
 	</table>
