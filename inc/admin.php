@@ -513,35 +513,6 @@ class WoopraAdmin extends Woopra {
 </pre>", 'woopra')); ?>
 			</td>
 		</tr>
-		<tr valign="top">
-			<th scope="row"><?php _e('Admin Area Events', 'woopra'); ?></th>
-			<td>
-			<?php
-				foreach ( $this->_events as $event => $data) {
-					if ($data['adminonly']) {
-						$event_admin++;
-						echo "\n\t<input type=\"checkbox\" value=\"1\"" . checked( '1', $event_status[(isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter']))], false ) . " id=\"" . ((isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter']))) . "\" name=\"woopra[woopra_event][".((isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter'])))."]\"/> <label for=\"woopra[woopra_event][".((isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter'])))."]\">".$data['name']."</label> - ".$data['label']."<br/>";
-					}
-				}
-				if ($event_admin < 1)
-					echo "<strong>" . __('No Admin Events Registered.', 'woopra') . "</strong>";
-			?>
-			</td>
-		</tr>
-		<tr valign="top">
-			<th scope="row"><?php _e('Third Party Events', 'woopra') ?></th>
-			<td>
-			<?php
-				/*
-				foreach ( $this->custom_events as $event => $data) {
-					echo "\n\t<input type=\"checkbox\" value=\"1\"" . checked( '1', $custom_event_status[$data['action']], false ) . " id=\"" . $data['action'] . "\" name=\"woopra[woopra_event][".$data['action']."]\"/> <label for=\"woopra[woopra_event][".$data['action']."]\">".$data['name']."</label><br />".$data['label'];
-				}
-				*/
-				if (!count($this->custom_events))
-					echo "<strong>" . __('No Custom Events Registered.', 'woopra') . "</strong>";
-			?>
-			</td>
-		</tr>
 	</table>
 	
 	<p class="submit">
