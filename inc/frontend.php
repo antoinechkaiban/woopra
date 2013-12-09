@@ -57,7 +57,7 @@ class WoopraFrontend extends Woopra {
 	 	foreach ($all_events as $event_name => $data) {
 	 		if (($event_status[$data['action']] == 1)) {
 		 		switch($data['action']) {
-		 			case "the_search_query":
+		 			case "search_query":
 		 				if (isset($_GET["s"])) {
 							$this->woopra->track("search", array("User searched" => $_GET["s"]), true);
 						}
@@ -65,10 +65,28 @@ class WoopraFrontend extends Woopra {
 		 			case "comment_post":
 		 				add_action('comment_post', array(&$this, 'track_comment'));
 		 			break;
+		 			case "signup":
+		 				add_action('user_register', array(&$this, 'track_signup'));
+		 			break;
 		 		}
 	 		}
 		}
 	 }
+
+	 /**
+	 * Tracks a signup
+	 * @return none
+	 */
+	 function track_signup( $user_id ) {
+		$user = get_user_by( 'id', $user_id );
+		$data = array(
+			"first_name" => $user->first_name,
+			"last_name" => $user->last_name,
+			"name" => $user->first_name . ' ' . $user->last_name,
+			"email" => $user->email
+		);
+		$this->woopra->track('signup', $data, true);
+	}
 	 
 	 /**
 	 * Tracks a comment
