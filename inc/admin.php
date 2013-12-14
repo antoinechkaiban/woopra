@@ -443,7 +443,7 @@ class WoopraAdmin extends Woopra {
 			<th scope="row"><?php _e('Track As', 'woopra') ?></th>
 			<td>
                 <input type="text" value="<?php echo $this->get_option('trackas') != "" ? $this->get_option('trackas') : $this->getDomainName() ; ?>" id="trackas" name="woopra[trackas]" />
-				<br/> <label for="trackas"><?php _e("Enter the your domain name here (i.e. domain.com) - don't need the www.") ?> </label>
+				<br/><p class="description"><?php _e("Enter the your domain name here (i.e. domain.com) - don't need the www.") ?></p>
 			</td>
 		</tr>
 		<tr valign="top">
