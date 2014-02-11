@@ -34,6 +34,7 @@ class WoopraFrontend extends Woopra {
 		//If event tracking is turned on, process events
 		if ($this->get_option('process_event')) {
 			$this->register_events();
+			$this->register_woocommerce_events();
 		}
 		
 		if ($this->get_option('other_events')) {
@@ -70,6 +71,30 @@ class WoopraFrontend extends Woopra {
 	 		}
 		}
 	 }
+
+	 /**
+	 * Registers woocommerce events
+	 * @return none
+	 */
+	 function register_woocommerce_events() {
+	 	$all_events = $this->events->default_woocommerce_events;
+	 	$event_status = $this->get_option('woopra_woocommerce_event');
+	 	foreach ($all_events as $event_name => $data) {
+	 		if (($event_status[$data['action']] == 1)) {
+		 		switch($data['action']) {
+		 			case "cart":
+		 				add_action('woocommerce_cart_updated', array(&$this, 'track_cart'));
+		 			break;
+		 			case "checkout":
+		 				add_action('woocommerce_after_checkout_validation', array(&$this, 'track_checkout'), 10, 1);
+		 			break;
+		 			case "payment":
+		 				add_action('woocommerce_payment_complete', array(&$this, 'track_payment'), 10, 1);
+		 			break;
+		 		}
+	 		}
+		}
+	}
 
 	 /**
 	 * Tracks a signup
@@ -119,6 +144,42 @@ class WoopraFrontend extends Woopra {
 			$this->woopra->identify($user_details);
 		}
 	 	$this->woopra->track("comment", $comment_details, true);
+	 }
+
+	 /**
+	 * Tracks a cart update
+	 * @return none
+	 */
+	 function track_cart() {
+	 	global $woocommerce;
+	 	$cart = $woocommerce->cart;
+	 	$params = array(
+	 		"count" => $cart->get_cart_contents_count(),
+	 		"subtotal" => $cart->subtotal,
+	 		"content_IDs" => implode(", ", array_keys($cart->get_cart()))
+	 	);
+	 	
+	 	$this->woopra->track('cart_update', $params, true);
+	 }
+
+	 /**
+	 * Tracks a checkout
+	 * @return none
+	 */
+	 function track_checkout($params) {
+	 	$this->woopra->track('checkout', $params, true);
+	 }
+
+	 /**
+	 * Tracks a payment
+	 * @return none
+	 */
+	 function track_payment($id) {
+	 	$order = new WC_ORDER($id);
+	 	$params = array(
+	 		"total" => $order->get_order_total()
+	 	);
+	 	$this->woopra->track('payment', $params, true);
 	 }
 	
 	/**

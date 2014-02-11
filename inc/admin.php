@@ -400,6 +400,9 @@ class WoopraAdmin extends Woopra {
 	$this->_events = $this->event->default_events;
 	$event_status = $this->get_option('woopra_event');
 
+	$this->_woocommerce_events = $this->event->default_woocommerce_events;
+	$woocommerce_event_status = $this->get_option('woopra_woocommerce_event');
+
 	?>
 	
 <div class="wrap">
@@ -497,6 +500,7 @@ class WoopraAdmin extends Woopra {
 			<th scope="row"><?php _e('Main Area Events', 'woopra') ?></th>
 			<td>
 			<?php
+				$event_reg = 0;
 				foreach ( $this->_events as $event => $data) {
 					if (!$data['adminonly']) {
 						$event_reg++;
@@ -508,6 +512,25 @@ class WoopraAdmin extends Woopra {
 			?>				
 			</td>
 		</tr>
+		<?php if(is_plugin_active( 'woocommerce/woocommerce.php' )) { ?>
+		<tr valign="top">
+			<th scope="row"><?php _e('WooCommerce Events', 'woopra') ?></th>
+			<td>
+			<?php
+				$event_reg = 0;
+				foreach ( $this->_woocommerce_events as $event => $data) {
+					if (!$data['adminonly']) {
+						$event_reg++;
+						echo "\n\t<input type=\"checkbox\" value=\"1\"" . checked( '1', $woocommerce_event_status[(isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter']))], false ) . " id=\"" . ((isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter']))) . "\" name=\"woopra[woopra_woocommerce_event][".((isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter'])))."]\"/> <label for=\"woopra[woopra_woocommerce_event][".((isset($data['setting']) ? $data['setting'] : (isset($data['action']) ? $data['action'] : $data['filter'])))."]\">".$data['name']."</label> - ".$data['label']."<br/>";
+					}
+				}
+				if ($event_reg < 1)
+					echo "<strong>" . __('No WooCommerce Events Registered.', 'woopra') . "</strong>";
+			?>				
+			</td>
+		</tr>
+
+		<?php } ?>
 		<tr valign="top">
 			<th scope="row"><?php _e('Other Events Tracking', 'woopra') ?></th>
 			<td>
