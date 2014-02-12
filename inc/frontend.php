@@ -137,7 +137,7 @@ class WoopraFrontend extends Woopra {
 	 		$comment_details["author_website"] = $comment->comment_author_url;
 	 	}
 	 	$comment_details["content"] = $comment->comment_content;
-	 	if (!is_user_logged_in() && $this->get_option('auto_tagging')) {
+	 	if (!is_user_logged_in()) {
 	 		$user_details = array();
 	 		$user_details["name"] = $comment->comment_author;
 	 		$user_details["email"] = $comment->comment_author_email;
@@ -196,9 +196,7 @@ class WoopraFrontend extends Woopra {
 				$this->user['admin'] = true;
 			}
 			//	Identify with woopra
-			if ($this->get_option('auto_tagging')) {
-				$this->woopra->identify($this->user);
-			}
+			$this->woopra->identify($this->user);
 		}
 	}
 	
