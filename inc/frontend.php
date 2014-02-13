@@ -1,4 +1,5 @@
 <?php
+error_reporting();
 /**
  * WoopraFrontend Class for Woopra
  * This class contains all functions and actions required for Woopra to track Wordpress events and outputs the frontend code.
@@ -83,13 +84,19 @@ class WoopraFrontend extends Woopra {
 	 		if (($event_status[$data['action']] == 1)) {
 		 		switch($data['action']) {
 		 			case "cart":
-		 				add_action('woocommerce_cart_updated', array(&$this, 'track_cart'));
+		 				add_action('woocommerce_cart_loaded_from_session', array(&$this, 'initialize_cart_quantities'));
+		 				add_action('woocommerce_after_cart_item_quantity_update', array(&$this, 'track_cart_quantity'));
+		 				add_action('woocommerce_before_cart_item_quantity_zero', array(&$this, 'track_cart_quantity_zero'));
+		 				add_action('woocommerce_add_to_cart', array(&$this, 'track_cart_add'));
 		 			break;
 		 			case "checkout":
 		 				add_action('woocommerce_after_checkout_validation', array(&$this, 'track_checkout'), 10, 1);
 		 			break;
 		 			case "payment":
 		 				add_action('woocommerce_payment_complete', array(&$this, 'track_payment'), 10, 1);
+		 			break;
+		 			case "coupon":
+		 				add_action('woocommerce_applied_coupon', array(&$this, 'track_coupon'), 10, 1);
 		 			break;
 		 		}
 	 		}
@@ -147,18 +154,84 @@ class WoopraFrontend extends Woopra {
 	 }
 
 	 /**
+	 * Initializes cart quantities (to compute deltas later on)
+	 * @return none
+	 */
+	 function initialize_cart_quantities() {
+	 	global $woocommerce;
+	 	$cart = $woocommerce->cart;
+	 	$this->cart_quantities = $cart->get_cart_item_quantities();
+	 }
+
+	 /**
 	 * Tracks a cart update
 	 * @return none
 	 */
-	 function track_cart() {
+	 function track_cart_quantity($cart_item_key, $quantity) {
 	 	global $woocommerce;
 	 	$cart = $woocommerce->cart;
+	 	$cart->calculate_totals();
+	 	$item = $cart->get_cart()[$cart_item_key];
+	 	$quantity_before = $this->cart_quantities[$item['variation_id'] ? $item['variation_id'] : $item['product_id']];
+	 	$quantity_after = $item["quantity"];
+	 	$product = get_product( $item['variation_id'] ? $item['variation_id'] : $item['product_id'] );
 	 	$params = array(
-	 		"count" => $cart->get_cart_contents_count(),
-	 		"subtotal" => $cart->subtotal,
-	 		"content_IDs" => implode(", ", array_keys($cart->get_cart()))
+	 		"item_sku" => $product->get_sku(),
+	 		"item_title" => $product->get_title(),
+	 		"item_price" => $product->get_price(),
+	 		"quantity" => ($quantity_after - $quantity_before),
+	 		"price" => ($quantity_after - $quantity_before)*$product->get_price()
 	 	);
-	 	
+	 	$this->user['cart_size'] = $cart->get_cart_contents_count();
+	 	$this->user['cart_subtotal'] = $cart->subtotal;
+	 	$this->woopra_detect();
+	 	$this->woopra->track('cart_update', $params, true);
+	 }
+
+	 /**
+	 * Tracks a cart update
+	 * @return none
+	 */
+	 function track_cart_quantity_zero($cart_item_key) {
+	 	global $woocommerce;
+	 	$cart = $woocommerce->cart;
+	 	$item = $cart->get_cart()[$cart_item_key];
+	 	$product = get_product( $item['variation_id'] ? $item['variation_id'] : $item['product_id'] );
+	 	$params = array(
+	 		"item_sku" => $product->get_sku(),
+	 		"item_title" => $product->get_title(),
+	 		"item_price" => $product->get_price(),
+	 		"quantity" => -$item["quantity"],
+	 		"price" => -$item["quantity"]*$product->get_price()
+	 	);
+	 	unset( $cart->cart_contents[ $cart_item_key ] );
+	 	$cart->calculate_totals();
+	 	$this->user['cart_size'] = $cart->get_cart_contents_count();
+	 	$this->user['cart_subtotal'] = $cart->subtotal;
+	 	$this->woopra_detect();
+	 	$this->woopra->track('cart_update', $params, true);
+	 }
+
+	 /**
+	 * Tracks a cart update
+	 * @return none
+	 */
+	 function track_cart_add($cart_item_key, $product_id, $quantity = 1, $variation_id, $variation, $cart_item_data) {
+	 	global $woocommerce;
+	 	$cart = $woocommerce->cart;
+	 	$cart->calculate_totals();
+	 	$item = $cart->get_cart()[$cart_item_key];
+	 	$product = get_product( $item['variation_id'] ? $item['variation_id'] : $item['product_id'] );
+	 	$params = array(
+	 		"item_sku" => $product->get_sku(),
+	 		"item_title" => $product->get_title(),
+	 		"item_price" => $product->get_price(),
+	 		"quantity" => $quantity,
+	 		"price" => $quantity*$product->get_price()
+	 	);
+	 	$this->user['cart_size'] = $cart->get_cart_contents_count();
+	 	$this->user['cart_subtotal'] = $cart->subtotal;
+	 	$this->woopra_detect();
 	 	$this->woopra->track('cart_update', $params, true);
 	 }
 
@@ -167,6 +240,13 @@ class WoopraFrontend extends Woopra {
 	 * @return none
 	 */
 	 function track_checkout($params) {
+	 	if (!is_user_logged_in()) {
+	 		$this->user['name'] = $params["billing_first_name"] . " " . $params["billing_last_name"];
+			$this->user['email'] = $params["billing_email"];
+			$this->woopra->identify($this->user);
+	 	} else {
+	 		$this->woopra_detect();
+	 	}
 	 	$this->woopra->track('checkout', $params, true);
 	 }
 
@@ -175,11 +255,29 @@ class WoopraFrontend extends Woopra {
 	 * @return none
 	 */
 	 function track_payment($id) {
+	 	$this->woopra_detect();
 	 	$order = new WC_ORDER($id);
 	 	$params = array(
 	 		"total" => $order->get_order_total()
 	 	);
 	 	$this->woopra->track('payment', $params, true);
+	 }
+
+	 /**
+	 * Tracks a coupon
+	 * @return none
+	 */
+	 function track_coupon($coupon_code) {
+	 	$coupon = new WC_COUPON($coupon_code);
+		if ($coupon->is_valid()) {
+			$this->woopra_detect();
+			$params = array(
+		 		"code" => $coupon->code,
+		 		"discount_type" => $coupon->discount_type,
+		 		"amount" => $coupon->amount
+		 	);
+			$this->woopra->track('coupon_applied', $params, true);
+		}
 	 }
 	
 	/**

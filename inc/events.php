@@ -120,6 +120,11 @@ class WoopraEvents extends WoopraFrontend {
 				'name'		=>	__('payment', 'woopra'),
 				'label'		=>	__('Show users payments.', 'woopra'),
 				'action'	=>	'payment',
+			),
+			array(
+				'name'		=>	__('coupon', 'woopra'),
+				'label'		=>	__('Show users applied coupons.', 'woopra'),
+				'action'	=>	'coupon',
 			)
 		);
 
