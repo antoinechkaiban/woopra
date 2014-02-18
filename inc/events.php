@@ -117,13 +117,8 @@ class WoopraEvents extends WoopraFrontend {
 				'action'	=>	'checkout',
 			),
 			array(
-				'name'		=>	__('payment', 'woopra'),
-				'label'		=>	__('Show users payments.', 'woopra'),
-				'action'	=>	'payment',
-			),
-			array(
 				'name'		=>	__('coupon', 'woopra'),
-				'label'		=>	__('Show users applied coupons.', 'woopra'),
+				'label'		=>	__('Track coupons applied.', 'woopra'),
 				'action'	=>	'coupon',
 			)
 		);

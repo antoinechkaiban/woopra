@@ -367,7 +367,7 @@ class WoopraAdmin extends Woopra {
 			), 'woopra_woocommerce_event'	=> array(
 				'cart' => 1,
 				'checkout' => 1,
-				'payment' => 1
+				'coupon' => 1
 			)
 		);
 		return $defaults;
