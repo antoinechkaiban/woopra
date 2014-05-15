@@ -25,9 +25,6 @@ class WoopraFrontend extends Woopra {
 		// Load Event Processing
 		$this->events = new WoopraEvents();
 		
-		// If there is no cookie, set one before the headers are sent
-		add_action('init', array(&$this->woopra, 'set_woopra_cookie'));
-		
 		//Detect Wordpress user
 		$this->user = array();
 		add_action('init', array(&$this, 'woopra_detect'));
