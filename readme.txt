@@ -68,6 +68,7 @@ A. Make sure that the plugin is active. If it's active and the code is not showi
 
 = 2.5.3 (02-18-14) =
 * [FIX] Fix setup URL in WordPress plugin
+* [FIX] Stop setting the cookie automatically from the back-end
 * [UPDATE] Other Plugin Dashboard Layout & Links Changes
 * [NEW] WooCommerce Support
 
